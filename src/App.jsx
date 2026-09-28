@@ -12,6 +12,8 @@ const VARIANT_LABELS = {
   C: 'Вариант C — альтернативная эвристика',
 }
 
+const HOST = "https://historythingserver.ru";
+
 function App() {
   const [plan, setPlan] = useState(null)
   const [baseline, setBaseline] = useState(null)
@@ -25,7 +27,7 @@ function App() {
 
   const ensureBaseline = async () => {
     if (baseline) return baseline
-    const resp = await fetch('http://localhost:8000/baseline', { method: 'POST' })
+    const resp = await fetch(HOST+'/baseline', { method: 'POST' })
     const data = await resp.json()
     setBaseline(data)
     return data
@@ -34,7 +36,7 @@ function App() {
   const loadPlan = async () => {
     setLoading(true)
     const [planResp] = await Promise.all([
-      fetch('http://localhost:8000/plan', { method: 'POST' }),
+      fetch(HOST+'/plan', { method: 'POST' }),
       ensureBaseline(),
     ])
     const data = await planResp.json()
@@ -48,7 +50,7 @@ function App() {
   const loadVariants = async () => {
     setVariantsLoading(true)
     const [variantsResp] = await Promise.all([
-      fetch('http://localhost:8000/plan-variants', { method: 'POST' }),
+      fetch(HOST+'/plan-variants', { method: 'POST' }),
       ensureBaseline(),
     ])
     const data = await variantsResp.json()
@@ -72,7 +74,7 @@ function App() {
   const doReassign = async (requestId, engineerId) => {
     if (!engineerId) return
     const params = new URLSearchParams({ request_id: requestId, target_engineer_id: engineerId })
-    const resp = await fetch(`http://localhost:8000/reassign?${params}`, { method: 'POST' })
+    const resp = await fetch(HOST+`/reassign?${params}`, { method: 'POST' })
     const result = await resp.json()
     if (result.error) {
       alert(result.error)
@@ -84,7 +86,7 @@ function App() {
   const loadReplan = async (extraParams) => {
     setReplanLoading(true)
     const params = new URLSearchParams(extraParams)
-    const resp = await fetch(`http://localhost:8000/replan?${params}`, { method: 'POST' })
+    const resp = await fetch(HOST+`/replan?${params}`, { method: 'POST' })
     const data = await resp.json()
     setReplanResult(data)
     if (data.new_plan) {
